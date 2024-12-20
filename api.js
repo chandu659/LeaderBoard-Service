@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import bodyParser from 'body-parser'; 
+import cors from 'cors';
+import admin from './admin.js';
+
 const app = express();
-const bodyParser = require('body-parser');
-const cors = require('cors');
-import admin from './admin';
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -41,17 +42,22 @@ app.get('/leaderboard/:competitionId', async (req, res) => {
     try {
         const snapshot = await db.ref(`competitions/${competitionId}/users`).orderByChild('score').once('value');
         const leaderboard = [];
+        console.log("test Leaderboard route:", leaderboard);
         snapshot.forEach(userSnapshot => {
             leaderboard.push({
                 userId: userSnapshot.key,
                 ...userSnapshot.val()
             });
         });
-        leaderboard.reverse(); // Highest score first
+        leaderboard.reverse(); 
         res.status(200).json(leaderboard);
     } catch (error) {
         res.status(500).send(error.message);
     }
+});
+
+app.get('/home', async (req, res) =>{
+    res.status(200).send('Welcome to the home page'); 
 });
 
 app.listen(5000, () => console.log('Server is running on port 5000'));
